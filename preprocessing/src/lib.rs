@@ -68,7 +68,8 @@ pub fn read_start_nodes() -> Result<Vec<usize>> {
     let reader = BufReader::new(file);
     let start_nodes_hashset: HashSet<usize> = serde_json::from_reader(reader)?;
     // convert to a vec
-    let start_nodes: Vec<usize> = start_nodes_hashset.into_iter().collect();
+    let mut start_nodes: Vec<usize> = start_nodes_hashset.into_iter().collect();
+    start_nodes.sort();
     Ok(start_nodes)
 }
 
