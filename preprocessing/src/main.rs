@@ -15,7 +15,7 @@ fn main() {
     let start_nodes = read_start_nodes().unwrap();
     let time_limit = 3600;
     let start_time = 28800;
-    println!("start node length {:?}", start_nodes);
+    println!("start node length {:?}", start_nodes.len());
 
     assert_eq!(graph_routes.len(), graph_walk.len());
     assert_eq!(graph_routes.len(), values.len());
