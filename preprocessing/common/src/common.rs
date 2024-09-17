@@ -1,0 +1,49 @@
+use anyhow::Result;
+use fs_err::File;
+use serde::{Deserialize, Serialize};
+use std::io::{BufWriter, Write};
+
+#[derive(Deserialize)]
+pub struct NodeWalk {
+    pub has_pt: bool,
+    pub edges: Vec<EdgeWalk>,
+}
+
+#[derive(Deserialize)]
+pub struct EdgeWalk {
+    pub cost: usize,
+    pub to: usize,
+}
+
+#[derive(Deserialize)]
+pub struct NodeRoute {
+    pub next_stop_node: usize,
+    pub timetable: Vec<EdgeRoute>,
+}
+
+#[derive(Deserialize)]
+pub struct EdgeRoute {
+    pub leavetime: usize,
+    pub cost: usize,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Times {
+    pub time: usize,
+    pub node: usize,
+    pub weight: u16,
+}
+
+pub fn write_json_file<T: Serialize>(
+    file_name: String,
+    output_directory: &str,
+    data: T,
+) -> Result<()> {
+    let path = format!("{output_directory}/{file_name}.json");
+    println!("Writing to {path}");
+    let file = File::create(path)?;
+    let mut writer = BufWriter::new(file);
+    serde_json::to_writer(&mut writer, &data)?;
+    writer.flush()?;
+    Ok(())
+}

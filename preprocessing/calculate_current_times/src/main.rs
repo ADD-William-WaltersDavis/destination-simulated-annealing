@@ -1,10 +1,11 @@
 mod floodfill;
+mod read_files;
 
 use indicatif::{ParallelProgressIterator, ProgressBar, ProgressStyle};
-use preproc::{
+use read_files::{
     read_graph_routes, read_graph_walk, read_node_weightings, read_start_nodes, read_values,
-    write_json_file, Times,
 };
+use common::common::{Times, write_json_file};
 use rayon::prelude::*;
 
 fn main() {
