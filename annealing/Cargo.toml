@@ -1,0 +1,19 @@
+[package]
+name = "annealing"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.79"
+fs-err = "2.11.0"
+indicatif = { version = "0.17.8", features = ["rayon"] }
+rayon = "1.8.1"
+serde_json = "1.0"
+serde = { version = "1.0.152", features = ["derive"] }
+kd-tree = { version = "0.6.0",  features = ["rayon"] }
+typenum = "1.14"
+rand = "0.8.5"
+
+[profile.release]
+lto = true
+codegen-units = 1
