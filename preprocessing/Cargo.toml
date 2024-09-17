@@ -23,3 +23,7 @@ path = "calculate_current_times/src/main.rs"
 [[bin]]
 name = "add_residence_to_graph_walk"
 path = "add_residence_to_graph_walk/src/main.rs"
+
+[[bin]]
+name = "combine_base_times"
+path = "combine_base_times/src/main.rs"

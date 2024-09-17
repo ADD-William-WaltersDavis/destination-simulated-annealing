@@ -35,12 +35,17 @@ pub struct EdgeRoute {
     pub cost: usize,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Times {
     pub time: usize,
     pub node: usize,
     pub weight: u16,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct BaseTimes (
+    pub Vec<u16>
+);
 
 pub fn write_json_file<T: Serialize>(
     file_name: String,
