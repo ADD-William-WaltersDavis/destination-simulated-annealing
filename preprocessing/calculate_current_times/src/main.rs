@@ -1,12 +1,12 @@
 mod floodfill;
 mod read_files;
 
+use common::common::{write_json_file, Times};
 use indicatif::{ParallelProgressIterator, ProgressBar, ProgressStyle};
+use rayon::prelude::*;
 use read_files::{
     read_graph_routes, read_graph_walk, read_node_weightings, read_start_nodes, read_values,
 };
-use common::common::{Times, write_json_file};
-use rayon::prelude::*;
 
 fn main() {
     for i in 0..37 {
@@ -21,10 +21,10 @@ fn main() {
         let time_limit = 3600;
         let start_nodes_len = start_nodes.len();
         println!("start node length {:?}", start_nodes_len);
-    
+
         assert_eq!(graph_routes.len(), graph_walk.len());
         assert_eq!(graph_routes.len(), values.len());
-        
+
         let progress = ProgressBar::new(start_nodes_len as u64).with_style(ProgressStyle::with_template(
             "[{elapsed_precise}] [{wide_bar:.cyan/blue}] {human_pos}/{human_len} ({per_sec}, {eta})").unwrap());
 

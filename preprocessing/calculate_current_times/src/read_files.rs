@@ -42,4 +42,3 @@ pub fn read_start_nodes() -> Result<Vec<usize>> {
     start_nodes.sort();
     Ok(start_nodes)
 }
-

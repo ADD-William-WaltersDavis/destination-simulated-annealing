@@ -9,7 +9,15 @@ pub struct NodeWalk {
     pub edges: Vec<EdgeWalk>,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
+pub struct NodeWalkWeighted {
+    pub has_pt: bool,
+    pub edges: Vec<EdgeWalk>,
+    pub has_residence: bool,
+    pub weight: u16,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct EdgeWalk {
     pub cost: usize,
     pub to: usize,
