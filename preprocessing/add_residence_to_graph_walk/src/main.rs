@@ -1,5 +1,5 @@
 use anyhow::Result;
-use common::common::{write_json_file, NodeWalk, NodeWalkWeighted};
+use common::common::{write_json_file, NodeWalkWeighted, read_pt_graph_walk};
 use fs_err::File;
 use std::io::BufReader;
 
@@ -42,13 +42,6 @@ fn main() {
         pt_graph_walk_weighted,
     )
     .unwrap();
-}
-
-fn read_pt_graph_walk() -> Result<Vec<NodeWalk>> {
-    let file = File::open("../data/pt_graph_walk.json")?;
-    let reader = BufReader::new(file);
-    let graph_walk: Vec<NodeWalk> = serde_json::from_reader(reader)?;
-    Ok(graph_walk)
 }
 
 fn read_residence_node_weightings() -> Result<Vec<u16>> {

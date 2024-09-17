@@ -1,7 +1,7 @@
 use anyhow::Result;
 use fs_err::File;
 use serde::{Deserialize, Serialize};
-use std::io::{BufWriter, Write};
+use std::io::{BufWriter, Write, BufReader};
 
 #[derive(Deserialize)]
 pub struct NodeWalk {
@@ -42,7 +42,7 @@ pub struct Times {
     pub weight: u16,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BaseTimes (
     pub Vec<u16>
 );
@@ -59,4 +59,11 @@ pub fn write_json_file<T: Serialize>(
     serde_json::to_writer(&mut writer, &data)?;
     writer.flush()?;
     Ok(())
+}
+
+pub fn read_pt_graph_walk() -> Result<Vec<NodeWalk>> {
+    let file = File::open("../data/pt_graph_walk.json")?;
+    let reader = BufReader::new(file);
+    let graph_walk: Vec<NodeWalk> = serde_json::from_reader(reader)?;
+    Ok(graph_walk)
 }
