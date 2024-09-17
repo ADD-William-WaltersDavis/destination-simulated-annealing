@@ -42,6 +42,6 @@ fn main() {
                 )
             })
             .collect();
-        write_json_file(format!("{:?}_results.json", start_time), "output", &results).unwrap();
+        write_json_file(format!("{:?}_results", start_time), "output", &results).unwrap();
     }
 }
