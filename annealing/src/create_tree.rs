@@ -10,7 +10,7 @@ pub fn run() -> Result<KdTree<Item>> {
     let coords: Vec<Item> = walk_nodes
         .iter()
         .map(|(node_id, coord)| Item {
-            point: [coord.x, coord.y],
+            point: [coord.e, coord.n],
             node_id: *node_id,
         })
         .collect();
@@ -22,7 +22,7 @@ pub fn run() -> Result<KdTree<Item>> {
 }
 
 fn read_walk_nodes() -> Result<HashMap<usize, Point>> {
-    let file = File::open("../data/walk_nodes.json")?;
+    let file = File::open("../data/walk_nodes_en.json")?;
     let reader = std::io::BufReader::new(file);
     let walk_nodes: HashMap<usize, Point> = serde_json::from_reader(reader)?;
     Ok(walk_nodes)

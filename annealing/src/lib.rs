@@ -50,8 +50,8 @@ impl KdPoint for Item {
 
 #[derive(Clone, Copy, Deserialize, Debug)]
 pub struct Point {
-    pub x: f64,
-    pub y: f64,
+    pub e: f64,
+    pub n: f64,
 }
 
 #[derive(Clone, Copy)]

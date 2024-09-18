@@ -31,7 +31,7 @@ fn main() {
     for i in 0..n_iterations {
         // TODO add a set of tested start nodes to avoid recalculating
         let start_node = kdtree
-            .nearest(&[candidate_point.y, candidate_point.x])
+            .nearest(&[candidate_point.e, candidate_point.n])
             .unwrap()
             .item
             .node_id;
@@ -85,23 +85,23 @@ fn get_settings() -> (usize, f64, [f64; 2], Bounds) {
     let temp = 1.0;
     let bounds: Bounds = Bounds {
         min: Point {
-            x: 53.822138,
-            y: -0.45730591,
+            e: 501650.0,
+            n: 437310.0,
         },
         max: Point {
-            x: 53.864068,
-            y: -0.41181564,
+            e: 504540.0,
+            n: 442041.0,
         },
     };
-    let step_size = [(bounds.max.x - bounds.min.x), (bounds.max.y - bounds.min.y)];
+    let step_size = [(bounds.max.e - bounds.min.e)/2.0, (bounds.max.n - bounds.min.n)/2.0];
     (n_iterations, temp, step_size, bounds)
 }
 
 fn set_start_point(bounds: &Bounds) -> Point {
     let mut rng = rand::thread_rng();
-    let lat = rng.gen_range(bounds.min.x..bounds.max.x);
-    let lon = rng.gen_range(bounds.min.y..bounds.max.y);
-    Point { x: lat, y: lon }
+    let easting = rng.gen_range(bounds.min.e..bounds.max.e);
+    let northing = rng.gen_range(bounds.min.n..bounds.max.n);
+    Point { e: easting, n: northing }
 }
 
 fn get_time_index_lookop() -> HashMap<usize, usize> {
@@ -130,23 +130,23 @@ fn get_new_candidate(
     _temperature: &f64, // TODO possible integration
     bounds: &Bounds,
 ) -> Point {
-    let mut new_point: Point = Point { x: 0.0, y: 0.0 };
+    let mut new_point: Point = Point { e: 0.0, n: 0.0 };
     let points_outside_bounds = true;
     let mut rng = rand::thread_rng();
     while points_outside_bounds {
-        let lat = rng.gen_range(-step_size[0]..step_size[0]);
-        let lon = rng.gen_range(-step_size[1]..step_size[1]);
-        let new_lat = current_point.x + lat;
-        let new_lon = current_point.y + lon;
+        let e_change = rng.gen_range(-step_size[0]..step_size[0]);
+        let n_change = rng.gen_range(-step_size[1]..step_size[1]);
+        let new_e = current_point.e + e_change;
+        let new_n = current_point.n + n_change;
 
-        if new_lon >= bounds.min.y
-            && new_lon <= bounds.max.y
-            && new_lat >= bounds.min.x
-            && new_lat <= bounds.max.x
+        if new_e >= bounds.min.e
+            && new_e <= bounds.max.e
+            && new_n >= bounds.min.n
+            && new_n <= bounds.max.n
         {
             new_point = Point {
-                x: new_lat,
-                y: new_lon,
+                e: new_e,
+                n: new_n,
             };
             break;
         }
