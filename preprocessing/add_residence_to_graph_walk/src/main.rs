@@ -1,5 +1,5 @@
 use anyhow::Result;
-use common::common::{write_json_file, NodeWalkWeighted, read_pt_graph_walk};
+use common::common::{read_pt_graph_walk, write_json_file, NodeWalkWeighted};
 use fs_err::File;
 use std::io::BufReader;
 

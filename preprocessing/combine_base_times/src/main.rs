@@ -1,5 +1,5 @@
-use common::common::{BaseTimes, Times, write_json_file, read_pt_graph_walk};
 use anyhow::Result;
+use common::common::{read_pt_graph_walk, write_json_file, BaseTimes, Times};
 use fs_err::File;
 use std::io::BufReader;
 
