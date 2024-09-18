@@ -1,7 +1,7 @@
 mod create_tree;
 mod reverse_floodfill;
 
-use annealing::{read_base_times, read_pt_graph_routes_reverse, read_weighted_graph_walk};
+use annealing::{read_base_times, read_pt_graph_routes_reverse, read_weighted_graph_walk, Point, Bounds};
 use rand::prelude::*;
 use rayon::iter::IntoParallelIterator;
 use rayon::prelude::*;
@@ -20,7 +20,7 @@ fn main() {
 
     let (n_iterations, temp, step_size, bounds) = get_settings();
 
-    let mut best_point = set_start_point(bounds);
+    let mut best_point = set_start_point(&bounds);
     let mut best_time_reduction = 0;
     let (mut previous_point, mut previous_time_reduction) = (best_point, best_time_reduction);
     let (mut candidate_point, mut candidate_time_reduction) = (best_point, best_time_reduction);
@@ -29,7 +29,12 @@ fn main() {
     let start_times = get_start_times();
 
     for i in 0..n_iterations {
-        let start_node = kdtree.nearest(&candidate_point).unwrap().item.node_id;
+        // TODO add a set of tested start nodes to avoid recalculating
+        let start_node = kdtree
+            .nearest(&[candidate_point.y, candidate_point.x])
+            .unwrap()
+            .item
+            .node_id;
 
         let time_reductions: Vec<usize> = start_times
             .clone()
@@ -60,7 +65,7 @@ fn main() {
                 < (delta_time_reduction as f64 / temperature).exp()
         {
             previous_time_reduction = candidate_time_reduction;
-            previous_point = candidate_point;
+            previous_point = candidate_point.clone();
         }
 
         // get new candidate point
@@ -71,23 +76,33 @@ fn main() {
             best_time_reduction = candidate_time_reduction;
             best_point = candidate_point;
         }
+
+        println!("Best point: {:?} with time reduction: {}", best_point, best_time_reduction);
     }
 }
 
-fn get_settings() -> (usize, f64, [f64; 2], [f64; 4]) {
-    let n_iterations = 5000;
-    let temp = 500.0;
-    // bounds in format [min_lat, max_lat, min_lon, max_lon]
-    let bounds: [f64; 4] = [53.822138, 53.864068, -0.45730591, -0.41181564];
-    let step_size = [(bounds[1] - bounds[0]), (bounds[3] - bounds[2])];
+fn get_settings() -> (usize, f64, [f64; 2], Bounds) {
+    let n_iterations = 100;
+    let temp = 1.0;
+    let bounds: Bounds = Bounds {
+        min: Point {
+            x: 53.822138,
+            y: -0.45730591,
+        },
+        max: Point {
+            x: 53.864068,
+            y: -0.41181564,
+        },
+    };
+    let step_size = [(bounds.max.x - bounds.min.x), (bounds.max.y - bounds.min.y)];
     (n_iterations, temp, step_size, bounds)
 }
 
-fn set_start_point(bounds: [f64; 4]) -> [f64; 2] {
+fn set_start_point(bounds: &Bounds) -> Point {
     let mut rng = rand::thread_rng();
-    let lat = rng.gen_range(bounds[0]..bounds[1]);
-    let lon = rng.gen_range(bounds[2]..bounds[3]);
-    [lat, lon]
+    let lat = rng.gen_range(bounds.min.x..bounds.max.x);
+    let lon = rng.gen_range(bounds.min.y..bounds.max.y);
+    Point { x: lat, y: lon }
 }
 
 fn get_time_index_lookop() -> HashMap<usize, usize> {
@@ -111,32 +126,31 @@ fn get_start_times() -> Vec<usize> {
 }
 
 fn get_new_candidate(
-    current_point: [f64; 2],
+    current_point: Point,
     step_size: &[f64; 2],
     _temperature: &f64, // TODO possible integration
-    bounds: &[f64; 4],
-) -> [f64; 2] {
+    bounds: &Bounds,
+) -> Point {
+    let mut new_point: Point = Point { x: 0.0, y: 0.0 };
+    let points_outside_bounds = true;
     let mut rng = rand::thread_rng();
-    let lat = rng.gen_range(-step_size[0]..step_size[0]);
-    let lon = rng.gen_range(-step_size[1]..step_size[1]);
-    let new_lat = current_point[0] + lat;
-    let new_lon = current_point[1] + lon;
+    while points_outside_bounds {
+        let lat = rng.gen_range(-step_size[0]..step_size[0]);
+        let lon = rng.gen_range(-step_size[1]..step_size[1]);
+        let new_lat = current_point.x + lat;
+        let new_lon = current_point.y + lon;
 
-    let new_lat = if new_lat < bounds[0] {
-        bounds[0]
-    } else if new_lat > bounds[1] {
-        bounds[1]
-    } else {
-        new_lat
-    };
-
-    let new_lon = if new_lon < bounds[2] {
-        bounds[2]
-    } else if new_lon > bounds[3] {
-        bounds[3]
-    } else {
-        new_lon
-    };
-
-    [new_lat, new_lon]
+        if new_lon >= bounds.min.y
+            && new_lon <= bounds.max.y
+            && new_lat >= bounds.min.x
+            && new_lat <= bounds.max.x
+        {
+            new_point = Point {
+                x: new_lat,
+                y: new_lon,
+            };
+            break;
+        }
+    }
+    new_point
 }

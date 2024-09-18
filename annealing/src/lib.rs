@@ -48,6 +48,18 @@ impl KdPoint for Item {
     }
 }
 
+#[derive(Clone, Copy, Deserialize, Debug)]
+pub struct Point {
+    pub x: f64,
+    pub y: f64,
+}
+
+#[derive(Clone, Copy)]
+pub struct Bounds {
+    pub min: Point,
+    pub max: Point,
+}
+
 pub fn read_weighted_graph_walk() -> Result<Vec<NodeWalkWeighted>> {
     let file = File::open("../data/pt_graph_walk_weighted.json")?;
     let reader = BufReader::new(file);

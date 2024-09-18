@@ -1,12 +1,11 @@
-use annealing::Item;
+use annealing::{Item, Point};
 use anyhow::Result;
 use fs_err::File;
 use kd_tree::KdTree;
-use serde::Deserialize;
 use std::collections::HashMap;
 use std::time::Instant;
 
-pub fn run() -> Result<(KdTree<Item>)> {
+pub fn run() -> Result<KdTree<Item>> {
     let walk_nodes = read_walk_nodes().unwrap();
     let coords: Vec<Item> = walk_nodes
         .iter()
@@ -22,15 +21,9 @@ pub fn run() -> Result<(KdTree<Item>)> {
     Ok(kdtree)
 }
 
-#[derive(Deserialize, Debug)]
-struct Coord {
-    x: f64,
-    y: f64,
-}
-
-fn read_walk_nodes() -> Result<HashMap<usize, Coord>> {
+fn read_walk_nodes() -> Result<HashMap<usize, Point>> {
     let file = File::open("../data/walk_nodes.json")?;
     let reader = std::io::BufReader::new(file);
-    let walk_nodes: HashMap<usize, Coord> = serde_json::from_reader(reader)?;
+    let walk_nodes: HashMap<usize, Point> = serde_json::from_reader(reader)?;
     Ok(walk_nodes)
 }
