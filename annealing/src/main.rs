@@ -76,9 +76,8 @@ fn main() {
             best_time_reduction = candidate_time_reduction;
             best_point = candidate_point;
         }
-
-        println!("Best point: {:?} with time reduction: {}", best_point, best_time_reduction);
     }
+    println!("Best point: {:?} with time reduction: {}", best_point, best_time_reduction);
 }
 
 fn get_settings() -> (usize, f64, [f64; 2], Bounds) {
