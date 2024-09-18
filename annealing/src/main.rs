@@ -1,11 +1,13 @@
 mod create_tree;
 mod reverse_floodfill;
 
-use annealing::{read_base_times, read_pt_graph_routes_reverse, read_weighted_graph_walk, Point, Bounds};
+use annealing::{
+    read_base_times, read_pt_graph_routes_reverse, read_weighted_graph_walk, Bounds, Point,
+};
 use rand::prelude::*;
 use rayon::iter::IntoParallelIterator;
 use rayon::prelude::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::time::Instant;
 
 fn main() {
@@ -28,13 +30,20 @@ fn main() {
     let time_index_lookup = get_time_index_lookop();
     let start_times = get_start_times();
 
+    let mut tested_start_nodes: HashSet<usize> = HashSet::new();
+
     for i in 0..n_iterations {
-        // TODO add a set of tested start nodes to avoid recalculating
         let start_node = kdtree
             .nearest(&[candidate_point.e, candidate_point.n])
             .unwrap()
             .item
             .node_id;
+
+        // skip if we have already tested this start node
+        if tested_start_nodes.contains(&start_node) {
+            continue;
+        }
+        tested_start_nodes.insert(start_node);
 
         let time_reductions: Vec<usize> = start_times
             .clone()
@@ -77,7 +86,10 @@ fn main() {
             best_point = candidate_point;
         }
     }
-    println!("Best point: {:?} with time reduction: {}", best_point, best_time_reduction);
+    println!(
+        "Best point: {:?} with time reduction: {}",
+        best_point, best_time_reduction
+    );
 }
 
 fn get_settings() -> (usize, f64, [f64; 2], Bounds) {
@@ -93,7 +105,10 @@ fn get_settings() -> (usize, f64, [f64; 2], Bounds) {
             n: 442041.0,
         },
     };
-    let step_size = [(bounds.max.e - bounds.min.e)/2.0, (bounds.max.n - bounds.min.n)/2.0];
+    let step_size = [
+        (bounds.max.e - bounds.min.e) / 2.0,
+        (bounds.max.n - bounds.min.n) / 2.0,
+    ];
     (n_iterations, temp, step_size, bounds)
 }
 
@@ -101,7 +116,10 @@ fn set_start_point(bounds: &Bounds) -> Point {
     let mut rng = rand::thread_rng();
     let easting = rng.gen_range(bounds.min.e..bounds.max.e);
     let northing = rng.gen_range(bounds.min.n..bounds.max.n);
-    Point { e: easting, n: northing }
+    Point {
+        e: easting,
+        n: northing,
+    }
 }
 
 fn get_time_index_lookop() -> HashMap<usize, usize> {
@@ -144,10 +162,7 @@ fn get_new_candidate(
             && new_n >= bounds.min.n
             && new_n <= bounds.max.n
         {
-            new_point = Point {
-                e: new_e,
-                n: new_n,
-            };
+            new_point = Point { e: new_e, n: new_n };
             break;
         }
     }
